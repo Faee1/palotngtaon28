@@ -1,68 +1,156 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>API examples</title>
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="./css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        .cover-photo {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .cover-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .search-container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .search-bar {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-bar:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        .results {
+            color: white; /* Adjust color as needed */
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
-
 <body>
-  <!-- Chuck Norris jokes -->
-  <div class="display-4 text-center">Chuck Norris jokes</div>
-  <div class="APIContainer">
-    <div class="jokeContainer">
-      <img class="img-thumbnail" id="jokeIcon">
-      <div>
-        <a class="h2 jokeTitle" href="#">Want to hear a joke?</a>
-        <p id="joke"></p>
-      </div>
-      <button class="btn btn-primary" id="buttonGetJoke">Yes!</button>
+    <div class="cover-photo">
+        <img src="awa.jpg" alt="Cover Photo" class="cover-image"> <!-- Replace with your image URL -->
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Enter Team ID..." class="search-bar">
+            <button id="search-button">Search</button>
+        </div>
     </div>
-  </div>
+    <div class="results" id="results"></div>
 
-  <!-- Currency exchange rates -->
-  <div class="display-4 text-center">Currency exchange rates</div>
-  <div class="APIContainer">
-    <h4>Find out current currency exchange rates</h4>
-    <div class="currencyContainer">
-      <div style="margin-top: 16px">
-          <p>From: </p>
-          <p>To: </p>
-      </div>
-      <div style="margin-left: 20px">
-        <input class="form-control marginTopBottom" type="text" id="inputCurrencyFrom" value="EUR">
-        <input class="form-control marginTopBottom" type="text" id="inputCurrencyTo" value="USD">
-        <button class="btn btn-primary" id="buttonCurrency">Calculate</button>
-      </div>
-      <div class="currencyResult">
-        <h4 id="currencyResult">Result: 0</h4>
-      </div>
-    </div>
-  </div>
-  
-  <!-- COVID 19 data -->
-  <div class="display-4 text-center">Latest COVID 19 statistics</div>
-  <div class="APIContainer">
-    <div class="covidInput">
-      <p>Select a country:</p>
-      <select class="form-control" id="countries">
-        <option>Select a country</option>
-      </select>
-    </div>
-    <hr class="mySeparator">
-    <div class="text-center">
-      <p class="marginTopBottom" id="covidNewConfirmed">New confirmed cases: /</p>
-      <p class="marginTopBottom" id="covidTotalConfirmed">Total confirmed cases: /</p>
-      <p class="marginTopBottom" id="covidNewDeaths">New deaths: /</p>
-      <p class="marginTopBottom" id="covidTotalDeaths">Total deaths: /</p>
-      <p class="marginTopBottom" id="covidLastUpdate">Last updated: /</p>
-    </div>
-  </div>
+    <script>
+        document.getElementById('search-button').onclick = function() {
+            const teamId = document.getElementById('search-input').value.trim(); // User input for team ID
+            if (!teamId) {
+                alert("Please enter a valid team ID.");
+                return;
+            }
 
-  <script src="./js/main.js" type="module"></script>
+            // Clear previous results
+            document.getElementById('results').innerHTML = '';
+
+            // Fetch random vegetarian dessert recipe from Spoonacular API
+            const xhr1 = new XMLHttpRequest();
+            xhr1.open('GET', 'https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random?tags=vegetarian%2Cdessert&number=1');
+            xhr1.setRequestHeader('x-rapidapi-key', 'b3ad11fab7msh6bb4cadebf10ef5p1f2cf3jsn174e569f5918');
+            xhr1.setRequestHeader('x-rapidapi-host', 'spoonacular-recipe-food-nutrition-v1.p.rapidapi.com');
+
+            xhr1.onload = function() {
+                console.log("Recipe API Response:", xhr1.responseText); // Log the response
+                if (xhr1.status === 200) {
+                    const recipeData = JSON.parse(xhr1.responseText);
+                    displayRecipe(recipeData);
+                } else {
+                    document.getElementById('results').innerText = "Error fetching recipe data.";
+                }
+            };
+
+            xhr1.onerror = function() {
+                document.getElementById('results').innerText = "Request failed for recipe.";
+            };
+
+            xhr1.send();
+
+            // Fetch NFL schedule from Sports Information API
+            const xhr2 = new XMLHttpRequest();
+            xhr2.open('GET', `https://sports-information.p.rapidapi.com/nfl/schedule-team?teamId=${teamId}`);
+            xhr2.setRequestHeader('x-rapidapi-key', 'b3ad11fab7msh6bb4cadebf10ef5p1f2cf3jsn174e569f5918');
+            xhr2.setRequestHeader('x-rapidapi-host', 'sports-information.p.rapidapi.com');
+
+            xhr2.onload = function() {
+                console.log("Sports API Response:", xhr2.responseText); // Log the response
+                if (xhr2.status === 200) {
+                    const sportsData = JSON.parse(xhr2.responseText);
+                    displaySportsSchedule(sportsData);
+                } else {
+                    document.getElementById('results').innerText += " Error fetching sports data.";
+                }
+            };
+
+            xhr2.onerror = function() {
+                document.getElementById('results').innerText += " Request failed for sports.";
+            };
+
+            xhr2.send();
+        };
+
+        function displayRecipe(data) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML += '<h2>Random Vegetarian Dessert Recipe:</h2>';
+            if (data && data.recipes && data.recipes.length > 0) {
+                const recipe = data.recipes[0];
+                resultsDiv.innerHTML += `<p><strong>${recipe.title}</strong></p>`;
+                resultsDiv.innerHTML += `<img src="${recipe.image}" alt="${recipe.title}" style="width:200px;height:auto;">`;
+                resultsDiv.innerHTML += `<p>${recipe.instructions}</p>`;
+            } else {
+                resultsDiv.innerHTML += "<p>No recipe found.</p>";
+            }
+        }
+
+        function displaySportsSchedule(data) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML += '<h2>NFL Schedule:</h2>';
+            if (data && data.schedule) {
+                data.schedule.forEach(game => {
+                    resultsDiv.innerHTML += `<p>${game.date}: ${game.homeTeam} vs ${game.awayTeam}</p>`;
+                });
+            } else {
+                resultsDiv.innerHTML += "<p>No schedule found for this team.</p>";
+            }
+        }
+    </script>
 </body>
-
 </html>
